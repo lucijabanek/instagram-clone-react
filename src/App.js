@@ -34,9 +34,10 @@ function App() {
 
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [openSignIn, setOpenSignIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() =>{
@@ -52,7 +53,7 @@ setUser(null);
 })
 return unsubcribe; //once if the user fact fires again, perform some cleanup actions before, we're unsubcribing the listener
 //so it doesn't spam and it doesn't start
-  }, [user, username]); //we using user and username, so we have o inclued them dependencies here
+  }, [user, username]); //we using user and username, so we have to include their dependencies here
   //because everytime they change,they have to be fired off, every time we use a variable
 
   useEffect(() => {
@@ -73,11 +74,23 @@ return unsubcribe; //once if the user fact fires again, perform some cleanup act
     .createUserWithEmailAndPassword(email, password)
     .then((authUser) => {
       return authUser.user.updateProfile({
-        displayName: username
+        displayName: username, 
       })
     })
     .catch((error) => alert(error.message));
-  };
+
+    setOpen(false);
+  }
+
+  const signIn = (event) => {
+    event.preventDefault();
+
+    auth
+    .signInWithEmailAndPassword(email, password)
+    .catch((error)=> alert(error.message))
+
+    setOpenSignIn(false);
+  }
 
   return (
     <div className="app">
@@ -116,7 +129,43 @@ return unsubcribe; //once if the user fact fires again, perform some cleanup act
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button type="submit" onClick={signUp}>Sign Up</Button>
+            <Button type="submit" onClick={signUp}>
+              Sign Up
+            </Button>
+          </form>
+        </div>
+      </Modal>
+
+      <Modal
+        open={openSignIn}
+        onClose={() => setOpenSignIn(false)} //inline function,  every time we click outside of
+        //the modal, it's gonna set the state of the model to be false and closes
+        //onClose is listening for any clicks outside of the modal
+      >
+        <div style={modalStyle} className={classes.paper}>
+          <form className="app__signup">
+            <center>
+              <img
+                className="app__headerImage"
+                src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+                alt=""
+              />
+            </center>
+            <Input
+              placeholder="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button type="submit" onClick={signIn}>
+              Sign In
+            </Button>
           </form>
         </div>
       </Modal>
@@ -129,7 +178,14 @@ return unsubcribe; //once if the user fact fires again, perform some cleanup act
         />
       </div>
 
-      <Button onClick={() => setOpen(true)}>Sign up</Button>
+      {user ? (
+        <Button onClick={() => auth.signOut()}>Log out</Button>
+      ) : (
+        <div className="app__loginContainer">
+          <Button onClick={() => setOpenSignIn(true)}>Sign in</Button>
+          <Button onClick={() => setOpen(true)}>Sign up</Button>
+        </div>
+      )}
 
       {/*Posts*/}
       {posts.map(({ id, post }) => (
