@@ -5,6 +5,7 @@ import { db, auth } from "./firebase";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import { Button, Input } from "@material-ui/core";
+import ImageUpload from "./ImageUpload";
 
 function getModalStyle() {
   const top = 50;
@@ -35,67 +36,68 @@ function App() {
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
   const [openSignIn, setOpenSignIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
-  useEffect(() =>{
-const unsubcribe = auth.onAuthStateChanged((authUser) => { //this keeps us logged in
-  if (authUser) {
-    //user has logged in
-console.log(authUser);
-setUser(authUser);
-  } else {
-    //user has logged out
-setUser(null);
-  }
-})
-return unsubcribe; //once if the user fact fires again, perform some cleanup actions before, we're unsubcribing the listener
-//so it doesn't spam and it doesn't start
+  useEffect(() => {
+    const unsubcribe = auth.onAuthStateChanged((authUser) => {
+      //this keeps us logged in
+      if (authUser) {
+        //user has logged in
+        console.log(authUser);
+        setUser(authUser);
+      } else {
+        //user has logged out
+        setUser(null);
+      }
+    });
+    return unsubcribe; //once if the user fact fires again, perform some cleanup actions before, we're unsubcribing the listener
+    //so it doesn't spam and it doesn't start
   }, [user, username]); //we using user and username, so we have to include their dependencies here
   //because everytime they change,they have to be fired off, every time we use a variable
 
   useEffect(() => {
-    db.collection("posts").onSnapshot((snapshot) => {
-      setPosts(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          post: doc.data(),
-        }))
-      );
-    });
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setPosts(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            post: doc.data(),
+          }))
+        );
+      });
   }, []);
 
   const signUp = (event) => {
     event.preventDefault();
 
     auth
-    .createUserWithEmailAndPassword(email, password)
-    .then((authUser) => {
-      return authUser.user.updateProfile({
-        displayName: username, 
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username,
+        });
       })
-    })
-    .catch((error) => alert(error.message));
+      .catch((error) => alert(error.message));
 
     setOpen(false);
-  }
+  };
 
   const signIn = (event) => {
     event.preventDefault();
 
     auth
-    .signInWithEmailAndPassword(email, password)
-    .catch((error)=> alert(error.message))
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error.message));
 
     setOpenSignIn(false);
-  }
+  };
 
   return (
     <div className="app">
-      {/*Header*/}
-
       <Modal
         open={open}
         onClose={() => setOpen(false)} //inline function,  every time we click outside of
@@ -176,26 +178,33 @@ return unsubcribe; //once if the user fact fires again, perform some cleanup act
           src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
           alt=""
         />
+
+        {user ? (
+          <Button onClick={() => auth.signOut()}>Log out</Button>
+        ) : (
+          <div className="app__loginContainer">
+            <Button onClick={() => setOpenSignIn(true)}>Sign in</Button>
+            <Button onClick={() => setOpen(true)}>Sign up</Button>
+          </div>
+        )}
       </div>
 
-      {user ? (
-        <Button onClick={() => auth.signOut()}>Log out</Button>
-      ) : (
-        <div className="app__loginContainer">
-          <Button onClick={() => setOpenSignIn(true)}>Sign in</Button>
-          <Button onClick={() => setOpen(true)}>Sign up</Button>
-        </div>
-      )}
+      <div className="app__posts">
+        {posts.map(({ id, post }) => (
+          <Post
+            key={id}
+            username={post.username}
+            caption={post.caption}
+            imageUrl={post.imageUrl}
+          />
+        ))}
+      </div>
 
-      {/*Posts*/}
-      {posts.map(({ id, post }) => (
-        <Post
-          key={id}
-          username={post.username}
-          caption={post.caption}
-          imageUrl={post.imageUrl}
-        />
-      ))}
+      {user?.displayName ? ( //user? protects you, if this is not there don't break
+        <ImageUpload username={user.displayName} />
+      ) : (
+        <h3>Login to upload</h3>
+      )}
     </div>
   );
 }
