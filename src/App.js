@@ -7,6 +7,7 @@ import Modal from "@material-ui/core/Modal";
 import { Button, Input } from "@material-ui/core";
 import ImageUpload from "./ImageUpload";
 import InstagramEmbed from "react-instagram-embed";
+import PublishIcon from "@material-ui/icons/Publish";
 
 function getModalStyle() {
   const top = 50;
@@ -20,13 +21,30 @@ function getModalStyle() {
 }
 
 const useStyles = makeStyles((theme) => ({
+  PublishIcon: {
+    display: "flex",
+    margin: "auto",
+    fontSize: "50px",
+    color: "#6082a3",
+    "&:hover": { backgroundColor: "transparent", color: "black" },
+  },
   paper: {
+    display: "flex",
     position: "absolute",
+    justifyContent: "center",
     width: 400,
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
+    objectFit: "contain",
+    margin: "auto",
+  },
+  Modal: {
+    display: "flex",
+    justifyContent: "center",
+    height: "18%",
+    margin: "auto",
   },
 }));
 
@@ -36,11 +54,12 @@ function App() {
 
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
-  const [openSignIn, setOpenSignIn] = useState(false);
+  const [OpenSignIn, setOpenSignIn] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  const [openImageUpload, setOpenImageUpload] = useState(false);
   const clientAccessToken = `${process.env.REACT_APP_ID}|${process.env.REACT_APP_CLIENT_TOKEN}`;
 
   useEffect(() => {
@@ -141,7 +160,7 @@ function App() {
       </Modal>
 
       <Modal
-        open={openSignIn}
+        open={OpenSignIn}
         onClose={() => setOpenSignIn(false)} //inline function,  every time we click outside of
         //the modal, it's gonna set the state of the model to be false and closes
         //onClose is listening for any clicks outside of the modal
@@ -225,11 +244,21 @@ function App() {
         </div>
       </div>
 
-      {user?.displayName ? ( //user? protects you, if this is not there don't break
-        <ImageUpload username={user.displayName} />
-      ) : (
-        <h3>Login to upload</h3>
-      )}
+      {user?.displayName ? (
+        <div className="app__footer">
+          <PublishIcon
+            className={classes.PublishIcon}
+            onClick={() => setOpenImageUpload(true)}
+          ></PublishIcon>
+          <Modal
+            className={classes.Modal}
+            open={openImageUpload}
+            onClose={() => setOpenImageUpload(false)}
+          >
+            <ImageUpload username={user.displayName} />
+          </Modal>
+        </div>
+      ) : null}
     </div>
   );
 }

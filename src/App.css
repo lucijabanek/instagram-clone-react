@@ -35,4 +35,22 @@
 
 .app__postsRight {
   margin-left: 20px;
+  display: flex;
+  object-fit: contain;
+}
+
+.app__footer {
+  position: sticky;
+  border-top: 1px solid lightgray;
+  bottom: 0;
+  background-color: white;
+}
+
+@media all and (max-width: 629px) {
+  /* one column code */
+  .app__posts {
+    display: flex;
+    align-items: stretch;
+    flex-flow: column wrap;
+  }
 }
