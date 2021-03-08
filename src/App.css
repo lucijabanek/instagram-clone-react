@@ -30,12 +30,15 @@
 .app__posts {
   padding: 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 }
 
 .app__postsRight {
-  margin-left: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   display: flex;
+  justify-content: center;
   object-fit: contain;
 }
 
@@ -44,13 +47,4 @@
   border-top: 1px solid lightgray;
   bottom: 0;
   background-color: white;
-}
-
-@media all and (max-width: 629px) {
-  /* one column code */
-  .app__posts {
-    display: flex;
-    align-items: stretch;
-    flex-flow: column wrap;
-  }
 }

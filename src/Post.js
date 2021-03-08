@@ -1,10 +1,43 @@
 import React, { useState, useEffect } from "react";
 import "./Post.css";
+import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
+import { Button } from "@material-ui/core";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import DeleteIcon from "@material-ui/icons/Delete";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import InsertCommentOutlinedIcon from "@material-ui/icons/InsertCommentOutlined";
 import { db } from "./firebase";
 import firebase from "firebase";
 
+const useStyles = makeStyles(() => ({
+  DeleteIcon: {
+    fontSize: "25px",
+    display: "flex",
+  },
+  MoreVertIcon: {
+    fontSize: "20px",
+    display: "flex",
+  },
+  FavoriteBorderIcon: {
+    fontSize: "30px",
+    display: "flex",
+    padding: "3px",
+  },
+  InsertCommentOutlinedIcon: {
+    fontSize: "30px",
+    display: "flex",
+    padding: "3px",
+  },
+  DeleteIconComment: {
+    fontSize: "18px",
+    display: "flex",
+    paddingTop: "2px",
+  },
+}));
+
 function Post({ postId, user, username, caption, imageUrl }) {
+  const classes = useStyles();
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
 
@@ -42,23 +75,53 @@ function Post({ postId, user, username, caption, imageUrl }) {
     <div className="post">
       <div className="post__header">
         {/*header -> profile picture + username */}
-        <Avatar
-          className="post__avatar"
-          alt="lucijabanek"
-          src="/static/images/avatar/1.jpg"
-        />
-        <h3>{username}</h3>
+        <div className="post__username">
+          <Avatar
+            className="post__avatar"
+            alt="avatar"
+            src="/static/images/avatar/1.jpg"
+          />
+          <h3>{username}</h3>
+        </div>
+        {user ? (
+          <div className="post__deleteIcon">
+            <DeleteIcon
+              className={classes.DeleteIcon}
+              onclick="deleted"
+            ></DeleteIcon>
+          </div>
+        ) : null}
       </div>
       {/*image */}
       <img className="post__image" src={imageUrl} alt="" />
       {/*username + caption */}
-      <h4 className="post__text">
-        <strong>{username}</strong> {caption}
-      </h4>
+      {user ? (
+        <div className="post__likeComment">
+          <FavoriteBorderIcon
+            className={classes.FavoriteBorderIcon}
+          ></FavoriteBorderIcon>
+          <InsertCommentOutlinedIcon
+            className={classes.InsertCommentOutlinedIcon}
+          ></InsertCommentOutlinedIcon>
+        </div>
+      ) : null}
+      <div className="post__caption">
+        <h4 className="post__text">
+          <strong>{username}</strong> {caption}
+        </h4>
+        {user ? (
+          <MoreVertIcon className={classes.MoreVertIcon}></MoreVertIcon>
+        ) : null}
+      </div>
 
       <div className="post__comments">
         {comments.map((comment) => (
           <p>
+            {user ? (
+              <div className="post__deleteComment">
+                <DeleteIcon className={classes.DeleteIconComment}></DeleteIcon>
+              </div>
+            ) : null}
             <strong>{comment.username}</strong> {comment.text}
           </p>
         ))}

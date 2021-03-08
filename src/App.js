@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
-import Post from "./Post";
-import { db, auth } from "./firebase";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import { Button, Input } from "@material-ui/core";
-import ImageUpload from "./ImageUpload";
-import InstagramEmbed from "react-instagram-embed";
 import PublishIcon from "@material-ui/icons/Publish";
+import InstagramEmbed from "react-instagram-embed";
+
+import "./App.css";
+import Post from "./Post";
+import { db, auth } from "./firebase";
+import ImageUpload from "./ImageUpload";
 
 function getModalStyle() {
   const top = 50;
@@ -32,12 +33,11 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     position: "absolute",
     justifyContent: "center",
-    width: 400,
+    width: "300px",
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
-    objectFit: "contain",
     margin: "auto",
   },
   Modal: {
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
+  const [modalStyle] = useState(getModalStyle);
 
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
@@ -64,10 +64,11 @@ function App() {
 
   useEffect(() => {
     const unsubcribe = auth.onAuthStateChanged((authUser) => {
+      console.log("IN USE EFFECT USER");
       //this keeps us logged in
       if (authUser) {
         //user has logged in
-        console.log(authUser);
+        console.log("AUTHUSER", authUser);
         setUser(authUser);
       } else {
         //user has logged out
@@ -115,6 +116,10 @@ function App() {
       .catch((error) => alert(error.message));
 
     setOpenSignIn(false);
+  };
+
+  const closeImageUpload = () => {
+    setOpenImageUpload(false);
   };
 
   return (
@@ -244,19 +249,24 @@ function App() {
         </div>
       </div>
 
-      {user?.displayName ? (
+      {user ? (
         <div className="app__footer">
           <PublishIcon
             className={classes.PublishIcon}
             onClick={() => setOpenImageUpload(true)}
           ></PublishIcon>
-          <Modal
-            className={classes.Modal}
-            open={openImageUpload}
-            onClose={() => setOpenImageUpload(false)}
-          >
-            <ImageUpload username={user.displayName} />
-          </Modal>
+          {openImageUpload ? (
+            <Modal
+              className={classes.Modal}
+              open={openImageUpload}
+              onClose={() => setOpenImageUpload(false)}
+            >
+              <ImageUpload
+                username={user.displayName}
+                close={closeImageUpload}
+              />
+            </Modal>
+          ) : null}
         </div>
       ) : null}
     </div>
