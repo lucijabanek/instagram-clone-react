@@ -39,12 +39,6 @@
   align-items: center;
 }
 
-.post__deleteIcon {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
 .post__commentBox {
   display: flex;
   margin-top: 10px;
@@ -58,13 +52,17 @@
 
 .post__comments {
   display: flex;
-  flex-direction: column;
-  padding: 10px;
+  justify-content: space-between;
+  padding: 2px;
 }
 
-.post__comments p,
 .post__deleteComment {
   display: flex;
+}
+
+.post__userCaption {
+  display: flex;
+  padding-left: 5px;
 }
 
 .post__input {

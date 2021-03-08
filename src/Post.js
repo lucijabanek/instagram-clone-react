@@ -40,6 +40,11 @@ function Post({ postId, user, username, caption, imageUrl }) {
   const classes = useStyles();
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const deletePost = (event) => {
+    if (postId) {
+      db.collection("posts").doc(postId).delete();
+    }
+  };
 
   useEffect(() => {
     let unsubscribe;
@@ -83,13 +88,11 @@ function Post({ postId, user, username, caption, imageUrl }) {
           />
           <h3>{username}</h3>
         </div>
-        {user ? (
-          <div className="post__deleteIcon">
-            <DeleteIcon
-              className={classes.DeleteIcon}
-              onclick="deleted"
-            ></DeleteIcon>
-          </div>
+        {user.displayName === username ? (
+          <DeleteIcon
+            className={classes.DeleteIcon}
+            onClick={deletePost}
+          ></DeleteIcon>
         ) : null}
       </div>
       {/*image */}
@@ -109,23 +112,23 @@ function Post({ postId, user, username, caption, imageUrl }) {
         <h4 className="post__text">
           <strong>{username}</strong> {caption}
         </h4>
-        {user ? (
+        {user.displayName === username ? (
           <MoreVertIcon className={classes.MoreVertIcon}></MoreVertIcon>
         ) : null}
       </div>
 
-      <div className="post__comments">
-        {comments.map((comment) => (
-          <p>
-            {user ? (
-              <div className="post__deleteComment">
-                <DeleteIcon className={classes.DeleteIconComment}></DeleteIcon>
-              </div>
-            ) : null}
-            <strong>{comment.username}</strong> {comment.text}
-          </p>
-        ))}
-      </div>
+      {comments.map((comment) => (
+        <div className="post__comments">
+          <div className="post__userCaption">
+            <strong>{comment.username}</strong> {comment.text}{" "}
+          </div>
+          {user.displayName === username ? (
+            <div className="post__deleteComment">
+              <DeleteIcon className={classes.DeleteIconComment}></DeleteIcon>
+            </div>
+          ) : null}
+        </div>
+      ))}
 
       {/*not logged in*/}
       {user && (
