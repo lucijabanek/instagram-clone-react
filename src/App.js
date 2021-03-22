@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "50px",
     color: "#6082a3",
     "&:hover": { backgroundColor: "transparent", color: "black" },
+    cursor: "pointer",
   },
   paper: {
     display: "flex",
@@ -233,6 +234,32 @@ function App() {
         <div className="app__postsRight">
           {" "}
           {/*child*/}
+          <InstagramEmbed
+            url="https://www.instagram.com/p/CIOklFyJ8gn/"
+            clientAccessToken={clientAccessToken}
+            maxWidth={320}
+            hideCaption={false}
+            containerTagName="div"
+            protocol=""
+            injectScript
+            onLoading={() => {}}
+            onSuccess={() => {}}
+            onAfterRender={() => {}}
+            onFailure={() => {}}
+          />
+          <InstagramEmbed
+            url="https://www.instagram.com/p/CIOklFyJ8gn/"
+            clientAccessToken={clientAccessToken}
+            maxWidth={320}
+            hideCaption={false}
+            containerTagName="div"
+            protocol=""
+            injectScript
+            onLoading={() => {}}
+            onSuccess={() => {}}
+            onAfterRender={() => {}}
+            onFailure={() => {}}
+          />
           <InstagramEmbed
             url="https://www.instagram.com/p/CIOklFyJ8gn/"
             clientAccessToken={clientAccessToken}

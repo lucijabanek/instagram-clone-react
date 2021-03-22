@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Post.css";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
-import { Button } from "@material-ui/core";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import InsertCommentOutlinedIcon from "@material-ui/icons/InsertCommentOutlined";
+
 import { db } from "./firebase";
 import firebase from "firebase";
 
@@ -14,6 +13,7 @@ const useStyles = makeStyles(() => ({
   DeleteIcon: {
     fontSize: "25px",
     display: "flex",
+    cursor: "Pointer",
   },
   MoreVertIcon: {
     fontSize: "20px",
@@ -28,6 +28,7 @@ const useStyles = makeStyles(() => ({
     fontSize: "30px",
     display: "flex",
     padding: "3px",
+    cursor: "pointer",
   },
   DeleteIconComment: {
     fontSize: "18px",
@@ -40,11 +41,22 @@ function Post({ postId, user, username, caption, imageUrl }) {
   const classes = useStyles();
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+
   const deletePost = (event) => {
     if (postId) {
       db.collection("posts").doc(postId).delete();
     }
   };
+
+  const deleteComment = (id) => {
+    db.collection("posts").doc(postId).collection("comments").doc(id).delete();
+  };
+
+  const searchInput = useRef(null);
+
+  function handleFocus() {
+    searchInput.current.focus();
+  }
 
   useEffect(() => {
     let unsubscribe;
@@ -55,7 +67,9 @@ function Post({ postId, user, username, caption, imageUrl }) {
         .collection("comments")
         .orderBy("timestamp", "desc")
         .onSnapshot((snapshot) => {
-          setComments(snapshot.docs.map((doc) => doc.data()));
+          setComments(
+            snapshot.docs.map((doc) => ({ id: doc.id, comment: doc.data() }))
+          );
         });
     }
     //listener for specific post
@@ -88,10 +102,13 @@ function Post({ postId, user, username, caption, imageUrl }) {
           />
           <h3>{username}</h3>
         </div>
-        {user.displayName === username ? (
+        {user?.displayName === username ? (
           <DeleteIcon
             className={classes.DeleteIcon}
-            onClick={deletePost}
+            onClick={(e) => {
+              if (window.confirm("Are you sure you wish to delete this item?"))
+                deletePost(e);
+            }}
           ></DeleteIcon>
         ) : null}
       </div>
@@ -105,6 +122,7 @@ function Post({ postId, user, username, caption, imageUrl }) {
           ></FavoriteBorderIcon>
           <InsertCommentOutlinedIcon
             className={classes.InsertCommentOutlinedIcon}
+            onClick={handleFocus}
           ></InsertCommentOutlinedIcon>
         </div>
       ) : null}
@@ -112,28 +130,39 @@ function Post({ postId, user, username, caption, imageUrl }) {
         <h4 className="post__text">
           <strong>{username}</strong> {caption}
         </h4>
-        {user.displayName === username ? (
-          <MoreVertIcon className={classes.MoreVertIcon}></MoreVertIcon>
-        ) : null}
       </div>
-
-      {comments.map((comment) => (
-        <div className="post__comments">
-          <div className="post__userCaption">
-            <strong>{comment.username}</strong> {comment.text}{" "}
-          </div>
-          {user.displayName === username ? (
-            <div className="post__deleteComment">
-              <DeleteIcon className={classes.DeleteIconComment}></DeleteIcon>
+      <div className="comments">
+        {comments.map(({ id, comment }) => (
+          <div className="post__comments">
+            <div className="post__userCaption">
+              <strong key={comment.id}>{comment.username}</strong>{" "}
+              {comment.text}{" "}
             </div>
-          ) : null}
-        </div>
-      ))}
+            {user?.displayName === username ||
+            user?.displayName === comment.username ? (
+              <div className="post__deleteComment">
+                <DeleteIcon
+                  className={classes.DeleteIconComment}
+                  onClick={(e) => {
+                    if (
+                      window.confirm(
+                        "Are you sure you wish to delete this item?"
+                      )
+                    )
+                      deleteComment(id);
+                  }}
+                ></DeleteIcon>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
 
       {/*not logged in*/}
       {user && (
         <form className="post__commentBox">
           <input
+            ref={searchInput}
             className="post__input"
             type="text"
             placeholder="Add a comment..."

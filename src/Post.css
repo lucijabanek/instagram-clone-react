@@ -2,7 +2,8 @@
   background-color: white;
   max-width: 500px;
   border: 1px solid lightgray;
-  margin-bottom: 45px;
+  border-radius: 0.8%;
+  margin-bottom: 15px;
 }
 
 .post__image {
@@ -39,6 +40,16 @@
   align-items: center;
 }
 
+.comments {
+  max-height: 100px;
+  overflow: auto;
+}
+
+.comments .post__comments {
+  margin: 0;
+  animation: scroll;
+}
+
 .post__commentBox {
   display: flex;
   margin-top: 10px;
@@ -53,11 +64,15 @@
 .post__comments {
   display: flex;
   justify-content: space-between;
+  max-height: 100px;
   padding: 2px;
+  overflow: auto;
+  animation: scroll;
 }
 
 .post__deleteComment {
   display: flex;
+  cursor: pointer;
 }
 
 .post__userCaption {
@@ -78,4 +93,5 @@
   color: #6082a3;
   background-color: transparent;
   border-top: 1px solid lightgray;
+  cursor: pointer;
 }

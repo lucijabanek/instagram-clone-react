@@ -69,7 +69,7 @@ function ImageUpload({ username, close }) {
 
   return (
     <ImageUploadContainer>
-      <Progress className="imageUpload__progress" value={progress} max="100" />
+      <Progress value={progress} max="100" />
       <input
         type="text"
         placeholder="Enter a caption..."
@@ -77,7 +77,9 @@ function ImageUpload({ username, close }) {
         value={caption}
       />
       <input type="file" onChange={handleChange} />
-      <Button onClick={handleUpload}>Upload</Button>
+      <Button disabled={!image} onClick={handleUpload}>
+        Upload
+      </Button>
     </ImageUploadContainer>
   );
 }
